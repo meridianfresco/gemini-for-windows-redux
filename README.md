@@ -1,6 +1,6 @@
-<div align="center">
-  <img src="https://crystalpng.com/wp-content/uploads/2025/11/Gemini-logo.png" width="100" alt="Gemini Logo" />
-  <h1>Gemini Desktop for Windows</h1>
+<div align="left">
+  <img src="https://raw.githubusercontent.com/muhammadsirajulhaq/Gemini-for-Windows/a07004ca0a72fc383671df178b40cc8a00ad0ede/Google_Gemini_logo_2025.svg" width="350" alt="Gemini Logo" />
+  <h1>Gemini for Windows</h1>
   <p>A sleek, native, frameless desktop client bringing Google Gemini directly to your PC.</p>
 </div>
 
@@ -10,24 +10,22 @@
   <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="MIT License" />
 </p>
 
-> **Important**
-> **Gemini Desktop for Windows** is an unofficial, community-built Open Source wrapper for Google Gemini. It is built to provide a cleaner, more integrated, and distraction-free experience for PC users who want Gemini as a standalone app rather than a browser tab.
 
 If you enjoy the project or find it useful, consider dropping a ⭐ on the repository!
 
-## 📥 Download & Install
+## ✦ Download & Install
 
-**[⬇️ Download the latest `.exe` release here](#)** *(Note: Link this to your GitHub Releases page once published)*
+**[⬇ Download the latest `.exe` release here](#)**
 
-1. Download the latest `Gemini Desktop Setup.exe` from the Releases page.
+1. Download the latest `Gemini Setup.exe` from the Releases page.
 2. Run the installer.
 3. Access Gemini seamlessly from your Windows App List or System Tray!
 
-*(Note: During the first run, Windows SmartScreen might warn you about an unrecognized app since the executable is not heavily signed yet. Click "More Info" -> "Run Anyway").*
+*(Note: During the first run, Windows SmartScreen might warn you about an unrecognized app since this project is unofficial. Click "More Info" -> "Run Anyway").*
 
 ---
 
-## ✨ Features
+## ✦ Features
 
 * **Zero Chrome, Full Immersion:** No clunky browser tabs, no URL bars, no 1px borders. Just a pure, frameless Gemini interface.
 * **Native Windows 11 Feel:** Utilizes hidden title bars to retain the native soft drop-shadows and beautiful rounded corners of the Windows 11 DWM (Desktop Window Manager).
@@ -37,7 +35,7 @@ If you enjoy the project or find it useful, consider dropping a ⭐ on the repos
 
 ---
 
-## 🛠️ Building from Source
+## ✦ Building from Source
 
 Want to tinker with the code? Building it yourself is easy.
 
@@ -71,11 +69,11 @@ Make sure you have [Node.js](https://nodejs.org/) installed on your machine.
 
 ---
 
-## 🔍 SEO & Discoverability Highlights
+## ✦ SEO & Discoverability Highlights
 *(For users finding this page)*
 If you were looking for a **Gemini App for Windows**, **Gemini on PC**, or a **Gemini Windows Client**, you're in the right place! This wrapper is specifically optimized for Windows 10 & 11 environments.
 
-## ⚖️ Usage Rights & License
+## ✦ Usage Rights & License
 
 This project is licensed under the **MIT License**. You are free to use, modify, distribute, and build upon this code for personal and commercial purposes. 
 
