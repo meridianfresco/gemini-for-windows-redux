@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/8/8a/Google_Gemini_logo.svg" width="100" alt="Gemini Logo" />
+  <img src="https://crystalpng.com/wp-content/uploads/2025/11/Gemini-logo.png" width="100" alt="Gemini Logo" />
   <h1>Gemini Desktop for Windows</h1>
   <p>A sleek, native, frameless desktop client bringing Google Gemini directly to your PC.</p>
 </div>
