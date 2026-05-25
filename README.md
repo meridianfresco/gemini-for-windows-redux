@@ -1,5 +1,5 @@
 <div align="left">
-  <img src="https://raw.githubusercontent.com/muhammadsirajulhaq/Gemini-for-Windows/86b937a31e4fd601e79937cc6b05d70221a03576/media/Google_Gemini_logo_2025.svg" width="350" alt="Gemini Logo" />
+  <img src="media/3840px-Google_Gemini_logo_2026.png" width="350" alt="Gemini Logo" />
   <h1>Gemini for Windows</h1>
 <p align="right">
   <img src="https://img.shields.io/badge/Windows-10%2B-blue?style=for-the-badge&logo=windows" alt="Windows Support" />
