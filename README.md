@@ -15,7 +15,7 @@ If you enjoy the project or find it useful, consider dropping a ⭐ on the repos
 
 ## ✦ Download & Install
 
-**[⬇ Download the latest `.exe` release here](#)**
+**[Download the latest `.exe` release here](https://github.com/muhammadsirajulhaq/Gemini-for-Windows/releases)**
 
 1. Download the latest `Gemini Setup.exe` from the Releases page.
 2. Run the installer.
