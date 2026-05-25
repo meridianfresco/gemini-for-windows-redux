@@ -1,0 +1,6 @@
+{
+  "name": "Gemini Electron Desktop",
+  "description": "A Windows 11 custom frameless desktop wrapper for Google Gemini.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
