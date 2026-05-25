@@ -1,5 +1,5 @@
 <div align="left">
-  <img src="https://raw.githubusercontent.com/muhammadsirajulhaq/Gemini-for-Windows/a07004ca0a72fc383671df178b40cc8a00ad0ede/Google_Gemini_logo_2025.svg" width="350" alt="Gemini Logo" />
+  <img src="https://raw.githubusercontent.com/muhammadsirajulhaq/Gemini-for-Windows/86b937a31e4fd601e79937cc6b05d70221a03576/media/Google_Gemini_logo_2025.svg" width="350" alt="Gemini Logo" />
   <h1>Gemini for Windows</h1>
   <p>A sleek, native, frameless desktop client bringing Google Gemini directly to your PC.</p>
 </div>
