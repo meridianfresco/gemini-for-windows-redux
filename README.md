@@ -17,27 +17,28 @@ If you enjoy the project or find it useful, consider dropping a ⭐ on the repos
 
 **[Download the latest `.exe` release here](https://github.com/muhammadsirajulhaq/Gemini-for-Windows/releases)**
 
+[![VirusTotal Score](https://img.shields.io/badge/VirusTotal-0%2F65_Clean-brightgreen?style=for-the-badge&logo=virustotal)](https://www.virustotal.com/gui/file/354e97c61e361c690346325d69474ef2b7304787ac5aa8b4d220b6d3d7c720c6/detection)
+
 1. Download the latest `Gemini Setup.exe` from the Releases page.
 2. Run the installer.
 3. Access Gemini seamlessly from your Windows App List or System Tray!
 
-*(Note: During the first run, Windows SmartScreen might warn you about an unrecognized app since this project is unofficial. Click "More Info" -> "Run Anyway").*
+*(Note: Because this is a free, open-source project without a paid corporate certificate, Windows SmartScreen may show a 'Windows protected your PC' warning. To run the app, click More Info -> Run Anyway. You can view the full source code and build it yourself to verify its safety.).*
 
 ---
 
 ## ✦ Features
 
-* **Zero Chrome, Full Immersion:** No clunky browser tabs, no URL bars, no 1px borders. Just a pure, frameless Gemini interface.
-* **Native Windows 11 Feel:** Utilizes hidden title bars to retain the native soft drop-shadows and beautiful rounded corners of the Windows 11 DWM (Desktop Window Manager).
-* **Mac/Win7 Style Floating Controls:** Right-click anywhere to access window controls, or use the sleek system tray menu to minimize, maximize, center, and close.
+* **No Chrome, Neural Expressive:** No browser tabs, no URL bars, no window borders. Just the pure, frameless 'Neural Expressive' Gemini UI
+* **Native Windows 11 Feel:** Hidden title bars to retain the native soft drop-shadows and beautiful rounded corners of the Windows 11 DWM (Desktop Window Manager).
+* **Right-Click Controls:** Right-click anywhere to access window controls, or use the sleek system tray menu to minimize, maximize, center, and close.
 * **System Tray Integration:** Close the window and it minimizes smartly to your tray. Keeps Gemini running quietly in the background, ready when you need it.
-* **Google Auth Bypass:** Implements a custom Firefox User-Agent internally to securely log into your Google Account without triggering automated "insecure browser" blocks.
 
 ---
 
 ## ✦ Building from Source
 
-Want to tinker with the code? Building it yourself is easy.
+For Devs wanting to look into the code:
 
 ### Prerequisites
 Make sure you have [Node.js](https://nodejs.org/) installed on your machine.
@@ -46,22 +47,21 @@ Make sure you have [Node.js](https://nodejs.org/) installed on your machine.
 
 1. **Clone the repository** (or download the source ZIP):
    ```bash
-   git clone https://github.com/YourUsername/Gemini-Desktop-Windows.git
+   git clone https://github.com/muhammadsirajulhaq/Gemini-for-Windows.git
    ```
 2. **Navigate to the directory**:
    ```bash
-   cd Gemini-Desktop-Windows
+   cd Gemini-for-Windows
    ```
 3. **Install dependencies**:
    ```bash
    npm install
    ```
-4. **Place your icon:** Ensure there is an `icon.ico` file in the root directory for the app and tray icon.
-5. **Run the app locally** (for testing):
+4. **Run the app locally** (for testing):
    ```bash
    npm start
    ```
-6. **Compile to a `.exe`**:
+5. **Compile to a `.exe`**:
    ```bash
    npm run build:win
    ```
@@ -69,9 +69,9 @@ Make sure you have [Node.js](https://nodejs.org/) installed on your machine.
 
 ---
 
-## ✦ SEO & Discoverability Highlights
-*(For users finding this page)*
-If you were looking for a **Gemini App for Windows**, **Gemini on PC**, or a **Gemini Windows Client**, you're in the right place! This wrapper is specifically optimized for Windows 10 & 11 environments.
+## ✦ About
+
+If you were looking for a **Gemini App for Windows** you're in the right place! This wrapper is specifically optimized for Windows 10 & 11 environments.
 
 ## ✦ Usage Rights & License
 
