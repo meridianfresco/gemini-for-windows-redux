@@ -1,19 +1,28 @@
 {
-  "name": "gemini-desktop",
+  "name": "gemini-for-windows-redux",
   "private": true,
   "version": "1.0.0",
-  "description": "A sleek, frameless Google Gemini Desktop App for Windows 11.",
+  "description": "Google Gemini for Windows Redux - A sleek, native & frameless desktop client for Google Gemini.",
   "main": "main.js",
   "type": "commonjs",
+  "homepage": "https://github.com/meridianfresco/gemini-for-windows-redux",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meridianfresco/gemini-for-windows-redux.git"
+  },
+  "bugs": {
+    "url": "https://github.com/meridianfresco/gemini-for-windows-redux/issues"
+  },
   "keywords": [
     "gemini",
     "gemini-app",
     "gemini-desktop",
     "gemini-for-windows",
+    "gemini-for-windows-redux",
     "gemini-on-pc",
     "electron"
   ],
-  "author": "",
+  "author": "meridianfresco (https://github.com/meridianfresco)",
   "license": "MIT",
   "scripts": {
     "dev": "vite",

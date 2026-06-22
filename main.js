@@ -6,6 +6,12 @@ let mainWindow;
 let tray;
 let isQuitting = false;
 
+// Request single instance lock
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock) {
+    app.quit();
+}
+
 // Using a Firefox User-Agent prevents Google Auth from blocking the embedded browser
 const FIREFOX_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0';
 
@@ -13,25 +19,27 @@ function createWindow() {
     mainWindow = new BrowserWindow({
         width: 1200,
         height: 800,
-        frame: false, // Removes standard border, header
-        titleBarStyle: 'hidden', // Essential on Win11 to retain native rounded corners & soft shadow
-        titleBarOverlay: false, // Disables native overlay controls to allow our custom hover ones
-        backgroundColor: '#1E1F22', // Match dark theme flash
+        title: 'Gemini for Windows',
+        backgroundColor: '#1E1F22',
+        autoHideMenuBar: true,
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
-            sandbox: false
+            sandbox: false,
+            preload: path.join(__dirname, 'preload.js')
         },
         icon: path.join(__dirname, 'icon.ico')
     });
 
-    // Provide the alternative user agent to the session
-    mainWindow.webContents.userAgent = FIREFOX_UA;
+    // Prevent webpage from changing the title
+    mainWindow.on('page-title-updated', (event) => {
+        event.preventDefault();
+    });
 
-    // Load actual Gemini
+    mainWindow.webContents.userAgent = FIREFOX_UA;
     mainWindow.loadURL('https://gemini.google.com/');
 
-    // Secure external link handling - pop them out to actual browser
+    // External links open in user's browser
     mainWindow.webContents.setWindowOpenHandler(({ url }) => {
         if (url.startsWith('https://accounts.google.com') || url.startsWith('https://gemini.google.com')) {
             return { action: 'allow' };
@@ -40,7 +48,7 @@ function createWindow() {
         return { action: 'deny' };
     });
 
-    // Strip Gemini's internal web borders and scrollbars to prevent 1px visual artifacts on the edges
+    // Strip Gemini's internal web borders and scrollbars to prevent visual artifacts
     mainWindow.webContents.on('did-finish-load', () => {
         mainWindow.webContents.insertCSS(`
             html, body {
@@ -48,13 +56,11 @@ function createWindow() {
                 margin: 0 !important;
                 padding: 0 !important;
             }
-            /* Target Gemini's specific wrapping elements to ensure no nested borders bleed to the edges */
             #app-root, .app-container, main, mat-sidenav-container, .side-nav-container {
                 border: none !important;
                 box-shadow: none !important;
                 outline: none !important;
             }
-            /* Hide the web scrollbar to prevent the right/bottom edge from looking like a grey border */
             ::-webkit-scrollbar {
                 display: none !important;
                 width: 0 !important;
@@ -64,7 +70,7 @@ function createWindow() {
         `);
     });
 
-    // Don't quit, instead minimize/hide to tray when the frame is "closed"
+    // Minimize to tray on close
     mainWindow.on('close', (event) => {
         if (!isQuitting) {
             event.preventDefault();
@@ -73,7 +79,7 @@ function createWindow() {
         }
     });
 
-    // Right-Click Context Menu injection
+    // Right-click context menu
     mainWindow.webContents.on('context-menu', (event, params) => {
         const contextMenuTemplate = [
             { label: 'Back', click: () => { if (mainWindow.webContents.canGoBack()) mainWindow.webContents.goBack(); } },
@@ -112,14 +118,12 @@ function createTray() {
     const iconPath = path.join(__dirname, 'icon.ico');
     let trayIcon = iconPath;
 
-    // Handle missing icon gracefully (e.g. before user places icon.ico)
     if (!fs.existsSync(iconPath)) {
         console.warn("\n[Warning] icon.ico not found in the directory! Please place it here before building.\n");
-        // We'll create a completely transparent tray icon if none found so it still functions in dev
         const { nativeImage } = require('electron');
         trayIcon = nativeImage.createEmpty();
     }
-    
+
     try {
         tray = new Tray(trayIcon);
         const contextMenu = Menu.buildFromTemplate([
@@ -133,7 +137,6 @@ function createTray() {
         tray.setToolTip('Google Gemini');
         tray.setContextMenu(contextMenu);
 
-        // Single click system tray to restore application
         tray.on('click', () => {
            if (mainWindow) mainWindow.show();
         });
@@ -142,17 +145,126 @@ function createTray() {
     }
 }
 
-app.whenReady().then(() => {
-    createWindow();
-    createTray();
+function createMenu() {
+    const isMac = process.platform === 'darwin';
+    const menuTemplate = [
+        ...(isMac ? [{
+            label: app.name,
+            submenu: [
+                { role: 'about' },
+                { type: 'separator' },
+                { role: 'services' },
+                { type: 'separator' },
+                { role: 'hide' },
+                { role: 'hideOthers' },
+                { role: 'unhide' },
+                { type: 'separator' },
+                { role: 'quit' }
+            ]
+        }] : []),
+        {
+            label: 'File',
+            submenu: [
+                isMac ? { role: 'close' } : { role: 'quit' }
+            ]
+        },
+        {
+            label: 'Edit',
+            submenu: [
+                { role: 'undo' },
+                { role: 'redo' },
+                { type: 'separator' },
+                { role: 'cut' },
+                { role: 'copy' },
+                { role: 'paste' },
+                ...(isMac ? [
+                    { role: 'pasteAndMatchStyle' },
+                    { role: 'delete' },
+                    { role: 'selectAll' },
+                    { type: 'separator' },
+                    {
+                        label: 'Speech',
+                        submenu: [
+                            { role: 'startSpeaking' },
+                            { role: 'stopSpeaking' }
+                        ]
+                    }
+                ] : [
+                    { role: 'delete' },
+                    { type: 'separator' },
+                    { role: 'selectAll' }
+                ])
+            ]
+        },
+        {
+            label: 'View',
+            submenu: [
+                { role: 'reload' },
+                { role: 'forceReload' },
+                { role: 'toggleDevTools' },
+                { type: 'separator' },
+                { role: 'resetZoom' },
+                { role: 'zoomIn' },
+                { role: 'zoomOut' },
+                { type: 'separator' },
+                { role: 'togglefullscreen' }
+            ]
+        },
+        {
+            label: 'Window',
+            submenu: [
+                { role: 'minimize' },
+                { role: 'zoom' },
+                ...(isMac ? [
+                    { type: 'separator' },
+                    { role: 'front' },
+                    { type: 'separator' },
+                    { role: 'window' }
+                ] : [
+                    { role: 'close' }
+                ])
+            ]
+        },
+        {
+            role: 'help',
+            submenu: [
+                {
+                    label: 'About',
+                    click: async () => {
+                        await shell.openExternal('https://github.com/meridianfresco/gemini-for-windows-redux');
+                    }
+                }
+            ]
+        }
+    ];
 
-    app.on('activate', () => {
-        if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    const menu = Menu.buildFromTemplate(menuTemplate);
+    Menu.setApplicationMenu(menu);
+}
+
+if (gotTheLock) {
+    app.on('second-instance', (event, commandLine, workingDirectory) => {
+        // Someone tried to run a second instance, focus our window.
+        if (mainWindow) {
+            if (mainWindow.isMinimized()) mainWindow.restore();
+            mainWindow.show();
+            mainWindow.focus();
+        }
     });
-});
 
-app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-        app.quit();
-    }
-});
+    app.whenReady().then(() => {
+        createWindow();
+        createTray();
+        createMenu();
+
+        app.on('activate', () => {
+            if (BrowserWindow.getAllWindows().length === 0) createWindow();
+        });
+    });
+
+    app.on('window-all-closed', () => {
+        if (process.platform !== 'darwin') {
+            app.quit();
+        }
+    });
+}

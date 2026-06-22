@@ -1,26 +1,21 @@
 <div align="left">
   <img src="media/3840px-Google_Gemini_logo_2026.png" width="350" alt="Gemini Logo" />
-  <h1>Gemini for Windows</h1>
+  <h1>Google Gemini for Windows Redux</h1>
 <p align="right">
   <img src="https://img.shields.io/badge/Windows-10%2B-blue?style=for-the-badge&logo=windows" alt="Windows Support" />
   <img src="https://img.shields.io/badge/Electron-Latest-black?style=for-the-badge&logo=electron" alt="Electron Build" />
   <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="MIT License" />
 </p> 
-  <p>A sleek, native & frameless desktop client bringing Google Gemini™ directly to your PC.</p>
+  <p>A sleek, native & frameless desktop client bringing Google Gemini™ directly to your PC (Redux version with improvements).</p>
 </div>
-
-
-
 
 <h5>If you enjoy the project or find it useful, consider dropping a ⭐ on the repository!</h5>
 
 ## ✦ Download & Install
 
-**[Download the latest `.exe` release here](https://github.com/muhammadsirajulhaq/Gemini-for-Windows/releases)**
+**[Download the latest `.exe` release here](https://github.com/meridianfresco/gemini-for-windows-redux/releases)**
 
-[![VirusTotal Score](https://img.shields.io/badge/VirusTotal-0%2F65_Clean-brightgreen?style=for-the-badge&logo=virustotal)](https://www.virustotal.com/gui/file/354e97c61e361c690346325d69474ef2b7304787ac5aa8b4d220b6d3d7c720c6/detection)
-
-1. Download the latest `Gemini-Setup.exe` from the Releases page.
+1. Download the latest `Gemini Desktop Setup 1.0.0.exe` from the Releases page.
 2. Run the installer.
 3. Access Gemini seamlessly from your Windows App List or System Tray!
 
@@ -30,11 +25,15 @@
 
 ## ✦ Features
 
-* **No Chrome, Neural Expressive:** No browser tabs, no URL bars, no window borders. Just the frameless 'Neural Expressive' Gemini UI
-* **Native Windows 11 Feel:** Hidden title bars to for native soft drop-shadows and the rounded corners of the Windows 11 DWM (Desktop Window Manager).
+* **No Chrome, Neural Expressive:** No browser tabs, no URL bars, no window borders. Just the frameless 'Neural Expressive' Gemini UI.
+* **Native Windows 11 Feel:** Hidden title bars to enable native soft drop-shadows and the rounded corners of the Windows 11 DWM (Desktop Window Manager).
 * **Right-Click Controls:** Right-click anywhere to access window controls such as 'minimize, maximize, center, and close.' or use the system tray icon's menu to open or quit Gemini.
 * **System Tray Integration:** Close the window and it minimizes smartly to your tray. Keeps Gemini running quietly in the background, ready when you need it.
-* **Secure login:** Script-free Gemini web-app with secure PassKey Login support using the Firfox User-Agent internally to securely log-in to your Google Account. *Verified by VirusTotal.*
+* **Secure login:** Script-free Gemini web-app with secure PassKey Login support using a Firefox User-Agent internally to securely log-in to your Google Account.
+* **Redux Features:**
+  * **Application Menu Improvements:** Added a standard application menu bar containing a **Help -> About** option linking to the GitHub repository.
+  * **Auto-Hide Menu Bar:** The menu bar automatically hides itself unless you press the **Alt** key on your keyboard, keeping the user interface clean and frameless.
+  * **Single-Instance Enforcement:** Prevents multiple instances of the application from running simultaneously. Launching a new instance will automatically restore, show, and focus the already running window instead of creating a new process.
   
 ### Light Theme
 <img src="./media/Showcase-White.png" width="800">
@@ -55,11 +54,11 @@ Make sure you have [Node.js](https://nodejs.org/) installed on your machine.
 
 1. **Clone the repository** (or download the source ZIP):
    ```bash
-   git clone https://github.com/muhammadsirajulhaq/Gemini-for-Windows.git
+   git clone https://github.com/meridianfresco/gemini-for-windows-redux.git
    ```
 2. **Navigate to the directory**:
    ```bash
-   cd Gemini-for-Windows
+   cd gemini-for-windows-redux
    ```
 3. **Install dependencies**:
    ```bash
@@ -77,9 +76,16 @@ Make sure you have [Node.js](https://nodejs.org/) installed on your machine.
 
 ---
 
-## ✦ About
+## ✦ About & Credits
 
-If you were looking for a **Gemini App for Windows** you're in the right place! This wrapper is based on Electron for a borderless PWA of *'gemini.google.com'* and the codebase was generated entirely by ***gemini-3.1-pro-preview*** inside **Google AI Studio**.
+This is a fork/Redux of the original [Gemini-for-Windows](https://github.com/muhammadsirajulhaq/Gemini-for-Windows) wrapper by [muhammadsirajulhaq](https://github.com/muhammadsirajulhaq).
+
+**Redux Enhancements by [@meridianfresco](https://github.com/meridianfresco):**
+* **Application Menu Improvements:** Added standard menu template with Help -> About link.
+* **Auto-Hide Menu Bar:** Uses `autoHideMenuBar` configuration.
+* **Single-Instance Enforcement:** Integrates Electron's single instance lock APIs.
+
+This wrapper is based on Electron for a borderless PWA of *'gemini.google.com'*.
 
 <h5> Usage Rights & License:
 
