@@ -30,8 +30,8 @@
 * **Right-Click Controls:** Right-click anywhere to access window controls such as 'minimize, maximize, center, and close.' or use the system tray icon's menu to open or quit Gemini.
 * **System Tray Integration:** Close the window and it minimizes smartly to your tray. Keeps Gemini running quietly in the background, ready when you need it.
 * **Secure login:** Script-free Gemini web-app with secure PassKey Login support using a Firefox User-Agent internally to securely log-in to your Google Account.
-* **Draggable Window:** Frameless-style window layout with support for direct window dragging from customized title/drag areas.
 * **Redux Features:**
+  * **Draggable Window:** Frameless-style window layout with support for direct window dragging from customized title/drag areas.
   * **Application Menu Improvements:** Added a standard application menu bar containing a **Help -> About** option linking to the GitHub repository.
   * **Auto-Hide Menu Bar:** The menu bar automatically hides itself unless you press the **Alt** key on your keyboard, keeping the user interface clean and frameless.
   * **Single-Instance Enforcement:** Prevents multiple instances of the application from running simultaneously. Launching a new instance will automatically restore, show, and focus the already running window instead of creating a new process.
