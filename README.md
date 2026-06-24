@@ -25,17 +25,17 @@
 
 ## ✦ Features
 
-* **No Chrome, Neural Expressive:** No browser tabs, no URL bars, no window borders. Just the frameless 'Neural Expressive' Gemini UI.
-* **Native Windows 11 Feel:** Hidden title bars to enable native soft drop-shadows and the rounded corners of the Windows 11 DWM (Desktop Window Manager).
-* **Right-Click Controls:** Right-click anywhere to access window controls such as 'minimize, maximize, center, and close.' or use the system tray icon's menu to open or quit Gemini.
-* **System Tray Integration:** Close the window and it minimizes smartly to your tray. Keeps Gemini running quietly in the background, ready when you need it.
-* **Secure login:** Script-free Gemini web-app with secure PassKey Login support using a Firefox User-Agent internally to securely log-in to your Google Account.
-* **Redux Features:**
-  * **Draggable Window:** Frameless-style window layout with support for direct window dragging from customized title/drag areas.
-  * **Application Menu Improvements:** Added a standard application menu bar containing a **Help -> About** option linking to the GitHub repository.
-  * **Auto-Hide Menu Bar:** The menu bar automatically hides itself unless you press the **Alt** key on your keyboard, keeping the user interface clean and frameless.
-  * **Single-Instance Enforcement:** Prevents multiple instances of the application from running simultaneously. Launching a new instance will automatically restore, show, and focus the already running window instead of creating a new process.
-  
+* **Sleek Custom HTML Titlebar:** Custom-built frameless titlebar featuring a window title, page reload button, and Windows 11 style window controls (minimize, maximize/restore, and close) integrated directly into the window canvas with absolute vertical alignment.
+* **Dynamic Theme Integration:** Automatically monitors Google Gemini's visual theme settings at runtime. Transitions the titlebar background, borders, title text, and button hover styles seamlessly between Dark and Light mode presets.
+* **No Chrome, Neural Expressive:** No browser tabs, no URL bars, no native window borders. Just a dedicated, clean, borderless desktop app experience.
+* **System Tray Integration:** Closing the app window minimizes it to the Windows System Tray, allowing it to run efficiently in the background. Restore the window instantly by double-clicking the tray icon.
+* **Auto-Hide Menu Bar:** A standard application menu template (File, Edit, Options, View, Window, Help) that auto-hides itself during use. Pressing the **Alt** or **F10** key toggles its display.
+* **Spellcheck & Context Menu:** Embedded Electron spellchecker with local dictionary additions and right-click spelling suggestions, alongside common copy/paste actions and browser navigation controls.
+* **Single-Instance Enforcement:** Prevents multiple wrapper processes from launching concurrently. Opening a new window automatically reveals, focuses, and restores the active instance.
+* **Performance Enhancements:** Configured V8 engine memory pool size to 4GB (`--max-old-space-size=4096`) to guarantee fluid interactions, quick response times, and prevent stutters.
+* **Idle Memory Cleanup:** Refreshes and clears browser cache automatically after 1 hour of background idle time to conserve memory (safely checks if you have any unsaved text drafts in text fields before reloading).
+* **Secure Login:** Script-free, secure PassKey and Google account login utilizing an internal Firefox User-Agent.
+
 ### Light Theme
 <img src="./media/Showcase-White.png" width="800">
 
@@ -82,10 +82,13 @@ Make sure you have [Node.js](https://nodejs.org/) installed on your machine.
 This is a fork/Redux of the original [Gemini-for-Windows](https://github.com/muhammadsirajulhaq/Gemini-for-Windows) wrapper by [muhammadsirajulhaq](https://github.com/muhammadsirajulhaq).
 
 **Redux Enhancements by [@meridianfresco](https://github.com/meridianfresco):**
-* **Application Menu Improvements:** Added standard menu template with Help -> About link.
-* **Auto-Hide Menu Bar:** Uses `autoHideMenuBar` configuration.
-* **Single-Instance Enforcement:** Integrates Electron's single instance lock APIs.
-* **Draggable Window Support:** Configured draggable region support.
+* **Custom HTML Titlebar & Controls:** Replaced native window frame with an inline HTML titlebar, reload command, and custom Windows 11 window controls.
+* **Dynamic Theme Syncing:** Programmed classname and computed style tracking to dynamically switch the titlebar theme at runtime.
+* **Spelling Suggestions & Context Menu:** Integrated Electron's spellchecker, dictionary additions, text tools, and navigation context menus.
+* **Menu Bar Improvements:** Added standard menu layout with auto-hide behavior and **Alt**/**F10** keypress hooks.
+* **Memory Pool Limits:** Increased V8 heap size limits to 4GB for optimized execution speeds.
+* **Single-Instance Enforcement:** Added single instance locking and automatic window restoring.
+* **Idle Background Refresh:** Created an idle-time draft checker and cache-clearing reloader.
 
 This wrapper is based on Electron for a borderless PWA of *'gemini.google.com'*.
 
