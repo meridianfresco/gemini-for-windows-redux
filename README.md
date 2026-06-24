@@ -36,12 +36,6 @@
   * **Auto-Hide Menu Bar:** The menu bar automatically hides itself unless you press the **Alt** key on your keyboard, keeping the user interface clean and frameless.
   * **Single-Instance Enforcement:** Prevents multiple instances of the application from running simultaneously. Launching a new instance will automatically restore, show, and focus the already running window instead of creating a new process.
   
-### Light Theme
-<img src="./media/Showcase-White.png" width="800">
-
-### Dark Theme
-<img src="./media/Showcase-Black.png" width="800">
-
 ---
 
 ## ✦ Building from Source
