@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Tray, Menu, shell, screen } = require('electron');
+const { app, BrowserWindow, Tray, Menu, shell, screen, ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -65,11 +65,6 @@ function createWindow() {
         title: 'Gemini for Windows',
         backgroundColor: '#1E1F22',
         titleBarStyle: 'hidden',
-        titleBarOverlay: {
-            color: '#1E1F22',
-            symbolColor: '#C4C7C5',
-            height: 40
-        },
         autoHideMenuBar: true,
         webPreferences: {
             nodeIntegration: false,
@@ -87,12 +82,24 @@ function createWindow() {
     });
 
     // Track maximized state to adjust custom titlebar alignment on Windows
-    mainWindow.on('maximize', () => {
-        mainWindow.webContents.executeJavaScript(`document.documentElement.classList.add('maximized')`).catch(() => {});
-    });
-    mainWindow.on('unmaximize', () => {
-        mainWindow.webContents.executeJavaScript(`document.documentElement.classList.remove('maximized')`).catch(() => {});
-    });
+    const sendWindowState = () => {
+        if (mainWindow) {
+            mainWindow.webContents.send('window-state', {
+                isMaximized: mainWindow.isMaximized()
+            });
+            mainWindow.webContents.executeJavaScript(`document.documentElement.classList.add('maximized')`).catch(() => {});
+        }
+    };
+    const sendWindowUnmaximizedState = () => {
+        if (mainWindow) {
+            mainWindow.webContents.send('window-state', {
+                isMaximized: false
+            });
+            mainWindow.webContents.executeJavaScript(`document.documentElement.classList.remove('maximized')`).catch(() => {});
+        }
+    };
+    mainWindow.on('maximize', sendWindowState);
+    mainWindow.on('unmaximize', sendWindowUnmaximizedState);
 
     mainWindow.webContents.userAgent = FIREFOX_UA;
     mainWindow.loadURL('https://gemini.google.com/');
@@ -145,6 +152,23 @@ function createWindow() {
                 background: transparent !important;
             }
 
+            /* Custom Titlebar Theme Variables */
+            :root {
+                --titlebar-bg: #1E1F22;
+                --titlebar-color: #C4C7C5;
+                --titlebar-border: rgba(255, 255, 255, 0.05);
+                --titlebar-btn-hover: rgba(255, 255, 255, 0.1);
+                --titlebar-btn-active: rgba(255, 255, 255, 0.15);
+            }
+
+            .titlebar-light {
+                --titlebar-bg: #F0F4F9;
+                --titlebar-color: #444746;
+                --titlebar-border: rgba(0, 0, 0, 0.06);
+                --titlebar-btn-hover: rgba(0, 0, 0, 0.1);
+                --titlebar-btn-active: rgba(0, 0, 0, 0.18);
+            }
+
             /* Custom Titlebar and Drag Region */
             #custom-titlebar {
                 position: fixed !important;
@@ -153,12 +177,12 @@ function createWindow() {
                 width: 100% !important;
                 height: 40px !important;
                 z-index: 2147483647 !important;
-                background-color: #1E1F22 !important;
+                background-color: var(--titlebar-bg) !important;
                 display: flex !important;
                 align-items: center !important;
                 box-sizing: border-box !important;
                 -webkit-app-region: drag !important;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+                border-bottom: 1px solid var(--titlebar-border) !important;
                 user-select: none !important;
             }
 
@@ -169,7 +193,7 @@ function createWindow() {
                 bottom: 0 !important;
                 display: flex !important;
                 align-items: center !important;
-                color: #C4C7C5 !important;
+                color: var(--titlebar-color) !important;
                 font-size: 12px !important;
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
                 font-weight: 500 !important;
@@ -183,7 +207,7 @@ function createWindow() {
                 -webkit-app-region: no-drag !important;
                 background-color: transparent !important;
                 border: none !important;
-                color: #C4C7C5 !important;
+                color: var(--titlebar-color) !important;
                 cursor: pointer !important;
                 width: 46px !important;
                 height: 100% !important;
@@ -206,11 +230,11 @@ function createWindow() {
             }
 
             .titlebar-reload-btn:hover {
-                background-color: rgba(255, 255, 255, 0.1) !important;
+                background-color: var(--titlebar-btn-hover) !important;
             }
 
             .titlebar-reload-btn:active {
-                background-color: rgba(255, 255, 255, 0.15) !important;
+                background-color: var(--titlebar-btn-active) !important;
             }
 
             .titlebar-reload-btn svg {
@@ -219,15 +243,84 @@ function createWindow() {
                 fill: currentColor !important;
             }
 
+            /* Custom Titlebar Window Controls Styles */
+            #custom-titlebar-controls {
+                position: absolute !important;
+                right: 0 !important;
+                top: 0 !important;
+                height: 100% !important;
+                display: flex !important;
+                align-items: center !important;
+                z-index: 2147483647 !important;
+                box-sizing: border-box !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            #custom-titlebar-controls button {
+                width: 46px !important;
+                height: 100% !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                background: transparent !important;
+                border: none !important;
+                color: var(--titlebar-color) !important;
+                cursor: pointer !important;
+                -webkit-app-region: no-drag !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                box-sizing: border-box !important;
+                position: relative !important;
+                outline: none !important;
+                box-shadow: none !important;
+                transition: background-color 0.1s ease, color 0.1s ease !important;
+            }
+
+            #custom-titlebar-controls svg {
+                width: 10px !important;
+                height: 10px !important;
+                min-width: 10px !important;
+                min-height: 10px !important;
+                max-width: 10px !important;
+                max-height: 10px !important;
+                display: block !important;
+                position: static !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                transform: none !important;
+                overflow: visible !important;
+                box-sizing: content-box !important;
+                vertical-align: middle !important;
+            }
+
+            #custom-titlebar-minimize svg rect {
+                fill: currentColor !important;
+                stroke: none !important;
+            }
+
+            #custom-titlebar-maximize svg rect,
+            #custom-titlebar-maximize svg path {
+                fill: none !important;
+                stroke: currentColor !important;
+                stroke-width: 1 !important;
+            }
+
+            #custom-titlebar-close svg path {
+                fill: none !important;
+                stroke: currentColor !important;
+                stroke-width: 1 !important;
+            }
+
             /* Adjust titlebar height and top margin on Windows when maximized */
             .platform-win32.maximized #custom-titlebar {
-                height: 34px !important;
+                height: 40px !important;
                 top: 8px !important;
             }
 
             .platform-win32.maximized body {
-                transform: translateY(42px) !important;
-                height: calc(100vh - 42px) !important;
+                transform: translateY(48px) !important;
+                height: calc(100vh - 48px) !important;
             }
 
             /* Hide titlebar and restore size in fullscreen */
@@ -615,9 +708,35 @@ if (gotTheLock) {
         });
     });
 
+    app.on('before-quit', () => {
+        isQuitting = true;
+    });
+
     app.on('window-all-closed', () => {
         if (process.platform !== 'darwin') {
             app.quit();
         }
+    });
+
+    // Custom window controls IPC handlers
+    ipcMain.on('get-window-state', (event) => {
+        event.returnValue = {
+            isMaximized: mainWindow ? mainWindow.isMaximized() : false
+        };
+    });
+    ipcMain.on('window-minimize', () => {
+        if (mainWindow) mainWindow.minimize();
+    });
+    ipcMain.on('window-maximize', () => {
+        if (mainWindow) {
+            if (mainWindow.isMaximized()) {
+                mainWindow.unmaximize();
+            } else {
+                mainWindow.maximize();
+            }
+        }
+    });
+    ipcMain.on('window-close', () => {
+        if (mainWindow) mainWindow.close();
     });
 }
