@@ -5,6 +5,49 @@ const fs = require('fs');
 let mainWindow;
 let tray;
 let isQuitting = false;
+let hideTimeout = null;
+
+let settingsPath = null;
+function getSettingsPath() {
+    if (!settingsPath) {
+        settingsPath = path.join(app.getPath('userData'), 'settings.json');
+    }
+    return settingsPath;
+}
+
+let settings = {
+    devToolsOnLaunch: false,
+    startWithWindows: false
+};
+
+function loadSettings() {
+    try {
+        const p = getSettingsPath();
+        if (fs.existsSync(p)) {
+            const data = fs.readFileSync(p, 'utf8');
+            const parsed = JSON.parse(data);
+            settings = { ...settings, ...parsed };
+        }
+    } catch (e) {
+        console.error('Failed to load settings:', e);
+    }
+}
+
+function saveSettings() {
+    try {
+        const p = getSettingsPath();
+        const dir = path.dirname(p);
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        fs.writeFileSync(p, JSON.stringify(settings, null, 2), 'utf8');
+    } catch (e) {
+        console.error('Failed to save settings:', e);
+    }
+}
+
+// Limit V8 engine space size to 512MB to force aggressive garbage collection and prevent memory leaks
+app.commandLine.appendSwitch('js-flags', '--max-old-space-size=512');
 
 // Request single instance lock
 const gotTheLock = app.requestSingleInstanceLock();
@@ -21,11 +64,18 @@ function createWindow() {
         height: 800,
         title: 'Gemini for Windows',
         backgroundColor: '#1E1F22',
+        titleBarStyle: 'hidden',
+        titleBarOverlay: {
+            color: '#1E1F22',
+            symbolColor: '#C4C7C5',
+            height: 40
+        },
         autoHideMenuBar: true,
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
             sandbox: false,
+            spellcheck: true,
             preload: path.join(__dirname, 'preload.js')
         },
         icon: path.join(__dirname, 'icon.ico')
@@ -38,6 +88,11 @@ function createWindow() {
 
     mainWindow.webContents.userAgent = FIREFOX_UA;
     mainWindow.loadURL('https://gemini.google.com/');
+
+    // Open DevTools if enabled in settings
+    if (settings.devToolsOnLaunch) {
+        mainWindow.webContents.openDevTools();
+    }
 
     // External links open in user's browser
     mainWindow.webContents.setWindowOpenHandler(({ url }) => {
@@ -67,6 +122,108 @@ function createWindow() {
                 height: 0 !important;
                 background: transparent !important;
             }
+
+            /* Custom Titlebar and Drag Region */
+            html {
+                transform: translateY(40px) !important;
+                height: calc(100vh - 40px) !important;
+                width: 100vw !important;
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                box-sizing: border-box !important;
+                overflow: hidden !important;
+            }
+
+            body {
+                height: 100% !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: auto !important;
+            }
+
+            #custom-titlebar {
+                position: fixed !important;
+                top: -40px !important;
+                left: 0 !important;
+                width: 100vw !important;
+                height: 40px !important;
+                z-index: 2147483647 !important;
+                background-color: #1E1F22 !important;
+                display: flex !important;
+                align-items: center !important;
+                box-sizing: border-box !important;
+                -webkit-app-region: drag !important;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+                user-select: none !important;
+            }
+
+            #custom-titlebar-title {
+                position: absolute !important;
+                left: 16px !important;
+                color: #C4C7C5 !important;
+                font-size: 12px !important;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+                font-weight: 500 !important;
+                pointer-events: none !important;
+            }
+
+            .titlebar-reload-btn {
+                position: absolute !important;
+                right: 138px !important;
+                top: 0 !important;
+                -webkit-app-region: no-drag !important;
+                background: transparent !important;
+                border: none !important;
+                color: #C4C7C5 !important;
+                cursor: pointer !important;
+                width: 46px !important;
+                height: 40px !important;
+                border-radius: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+            }
+
+            body.platform-darwin #custom-titlebar-title {
+                left: 80px !important;
+            }
+
+            body.platform-darwin .titlebar-reload-btn {
+                right: 16px !important;
+                width: 32px !important;
+                height: 32px !important;
+                border-radius: 50% !important;
+                top: 4px !important;
+            }
+
+            .titlebar-reload-btn:hover {
+                background-color: rgba(255, 255, 255, 0.06) !important;
+                color: #E3E3E3 !important;
+            }
+
+            .titlebar-reload-btn:active {
+                background-color: rgba(255, 255, 255, 0.12) !important;
+            }
+
+            .titlebar-reload-btn svg {
+                width: 18px !important;
+                height: 18px !important;
+                fill: currentColor !important;
+            }
+
+            /* Hide titlebar and restore size in fullscreen */
+            @media (display-mode: fullscreen) {
+                html {
+                    transform: none !important;
+                    height: 100vh !important;
+                    width: 100vw !important;
+                }
+                #custom-titlebar {
+                    display: none !important;
+                }
+            }
         `);
     });
 
@@ -75,42 +232,165 @@ function createWindow() {
         if (!isQuitting) {
             event.preventDefault();
             mainWindow.hide();
+
+            // Clear cache to free up memory while hidden
+            mainWindow.webContents.session.clearCache().catch((err) => {
+                console.error('Failed to clear cache:', err);
+            });
+
             event.returnValue = false;
+        }
+    });
+
+    // Handle idle states when window is blurred (unfocused, minimized, or hidden)
+    mainWindow.on('blur', () => {
+        if (hideTimeout) clearTimeout(hideTimeout);
+        hideTimeout = setTimeout(() => {
+            if (mainWindow && !mainWindow.isFocused()) {
+                // Check if there is any active text draft typed in the page before reloading
+                mainWindow.webContents.executeJavaScript(`
+                    (() => {
+                        const textareas = document.querySelectorAll('textarea');
+                        for (const ta of textareas) {
+                            if (ta.value && ta.value.trim().length > 0) return true;
+                        }
+                        const editables = document.querySelectorAll('[contenteditable="true"]');
+                        for (const ed of editables) {
+                            if (ed.textContent && ed.textContent.trim().length > 0) return true;
+                        }
+                        return false;
+                    })()
+                `).then((hasDraft) => {
+                    if (!hasDraft && mainWindow && !mainWindow.isFocused()) {
+                        mainWindow.webContents.session.clearCache().then(() => {
+                            if (mainWindow && !mainWindow.isFocused()) {
+                                mainWindow.webContents.reload();
+                            }
+                        }).catch((err) => {
+                            console.error('Failed to clear cache during idle:', err);
+                            if (mainWindow && !mainWindow.isFocused()) {
+                                mainWindow.webContents.reload();
+                            }
+                        });
+                    }
+                }).catch((err) => {
+                    console.error('Failed to check for draft:', err);
+                });
+            }
+        }, 60 * 60 * 1000); // 1 hour idle time
+    });
+
+    mainWindow.on('focus', () => {
+        // Cancel background reload if window is focused before the timeout
+        if (hideTimeout) {
+            clearTimeout(hideTimeout);
+            hideTimeout = null;
+        }
+    });
+
+    // Capture Alt and F10 key presses to show the application menu as a dropdown popup
+    let altPressed = false;
+    mainWindow.webContents.on('before-input-event', (event, input) => {
+        if (process.platform !== 'win32') return;
+
+        if (input.key === 'Alt') {
+            if (input.type === 'keyDown') {
+                altPressed = true;
+            } else if (input.type === 'keyUp' && altPressed) {
+                altPressed = false;
+                event.preventDefault();
+                const menu = Menu.getApplicationMenu();
+                if (menu) {
+                    menu.popup({
+                        window: mainWindow,
+                        x: 10,
+                        y: 40
+                    });
+                }
+            }
+        } else if (input.key === 'F10' && input.type === 'keyUp') {
+            altPressed = false;
+            event.preventDefault();
+            const menu = Menu.getApplicationMenu();
+            if (menu) {
+                menu.popup({
+                    window: mainWindow,
+                    x: 10,
+                    y: 40
+                });
+            }
+        } else {
+            altPressed = false;
         }
     });
 
     // Right-click context menu
     mainWindow.webContents.on('context-menu', (event, params) => {
-        const contextMenuTemplate = [
-            { label: 'Back', click: () => { if (mainWindow.webContents.canGoBack()) mainWindow.webContents.goBack(); } },
-            { label: 'Forward', click: () => { if (mainWindow.webContents.canGoForward()) mainWindow.webContents.goForward(); } },
-            { type: 'separator' },
-            { label: 'Reload', click: () => mainWindow.webContents.reload() },
-            { type: 'separator' },
-            { label: 'Cut', role: 'cut' },
-            { label: 'Copy', role: 'copy' },
-            { label: 'Paste', role: 'paste' },
-            { type: 'separator' },
-            { label: 'Center Window', click: () => {
-                if (mainWindow) {
-                    const bounds = mainWindow.getBounds();
-                    const display = screen.getDisplayNearestPoint({ x: bounds.x, y: bounds.y });
-                    const newX = display.workArea.x + Math.floor((display.workArea.width - bounds.width) / 2);
-                    const newY = display.workArea.y + Math.floor((display.workArea.height - bounds.height) / 2);
-                    mainWindow.setBounds({ x: newX, y: newY, width: bounds.width, height: bounds.height });
+        const template = [];
+
+        // 1. Add spelling suggestions if there are any
+        if (params.dictionarySuggestions && params.dictionarySuggestions.length > 0) {
+            for (const suggestion of params.dictionarySuggestions) {
+                template.push({
+                    label: suggestion,
+                    click: () => mainWindow.webContents.replaceMisspelling(suggestion)
+                });
+            }
+            template.push({ type: 'separator' });
+        }
+
+        // 2. Add 'Add to Dictionary' if the word is misspelled
+        if (params.misspelledWord) {
+            template.push({
+                label: `Add "${params.misspelledWord}" to Dictionary`,
+                click: () => mainWindow.webContents.session.addWordToSpellCheckerDictionary(params.misspelledWord)
+            });
+            template.push({ type: 'separator' });
+        }
+
+        // 3. Edit options (Cut, Copy, Paste, etc.)
+        if (params.isEditable) {
+            template.push({ label: 'Undo', role: 'undo' });
+            template.push({ label: 'Redo', role: 'redo' });
+            template.push({ type: 'separator' });
+            template.push({ label: 'Cut', role: 'cut' });
+            template.push({ label: 'Copy', role: 'copy' });
+            template.push({ label: 'Paste', role: 'paste' });
+            template.push({ type: 'separator' });
+            template.push({ label: 'Select All', role: 'selectall' });
+        } else if (params.selectionText) {
+            template.push({ label: 'Copy', role: 'copy' });
+        }
+
+        // 4. Navigation/Reload options (show if not clicking on editable/text selection, or just as standard default options)
+        if (!params.isEditable && !params.selectionText) {
+            if (template.length > 0) {
+                template.push({ type: 'separator' });
+            }
+            template.push({ label: 'Back', click: () => { if (mainWindow.webContents.canGoBack()) mainWindow.webContents.goBack(); } });
+            template.push({ label: 'Forward', click: () => { if (mainWindow.webContents.canGoForward()) mainWindow.webContents.goForward(); } });
+            template.push({ type: 'separator' });
+            template.push({ label: 'Reload', click: () => mainWindow.webContents.reload() });
+        }
+
+        // Clean up trailing / consecutive separators
+        const filteredTemplate = [];
+        for (let i = 0; i < template.length; i++) {
+            const current = template[i];
+            const next = template[i + 1];
+            // Skip separator if it's the last item or if it's followed by another separator
+            if (current.type === 'separator') {
+                if (filteredTemplate.length === 0 || i === template.length - 1 || (next && next.type === 'separator')) {
+                    continue;
                 }
-            }},
-            { type: 'separator' },
-            { label: 'Minimize', click: () => { if (mainWindow) mainWindow.minimize(); } },
-            { label: 'Maximize / Restore', click: () => {
-                if (mainWindow) {
-                    if (mainWindow.isMaximized()) mainWindow.unmaximize();
-                    else mainWindow.maximize();
-                }
-            }},
-            { label: 'Close', click: () => { if (mainWindow) mainWindow.close(); } }
-        ];
-        Menu.buildFromTemplate(contextMenuTemplate).popup(mainWindow);
+            }
+            filteredTemplate.push(current);
+        }
+
+        // Only popup menu if there is at least one item
+        if (filteredTemplate.length > 0) {
+            Menu.buildFromTemplate(filteredTemplate).popup(mainWindow);
+        }
     });
 }
 
@@ -197,6 +477,37 @@ function createMenu() {
             ]
         },
         {
+            label: 'Options',
+            submenu: [
+                {
+                    label: 'Open DevTools on Launch',
+                    type: 'checkbox',
+                    checked: settings.devToolsOnLaunch,
+                    click: (menuItem) => {
+                        settings.devToolsOnLaunch = menuItem.checked;
+                        saveSettings();
+                    }
+                },
+                {
+                    label: 'Start with Windows',
+                    type: 'checkbox',
+                    checked: settings.startWithWindows,
+                    click: (menuItem) => {
+                        settings.startWithWindows = menuItem.checked;
+                        saveSettings();
+                        try {
+                            app.setLoginItemSettings({
+                                openAtLogin: settings.startWithWindows,
+                                path: app.getPath('exe')
+                            });
+                        } catch (err) {
+                            console.error('Failed to set login item settings:', err);
+                        }
+                    }
+                }
+            ]
+        },
+        {
             label: 'View',
             submenu: [
                 { role: 'reload' },
@@ -253,6 +564,18 @@ if (gotTheLock) {
     });
 
     app.whenReady().then(() => {
+        loadSettings();
+
+        // Sync startup setting with Windows
+        try {
+            app.setLoginItemSettings({
+                openAtLogin: settings.startWithWindows,
+                path: app.getPath('exe')
+            });
+        } catch (err) {
+            console.error('Failed to sync login item settings:', err);
+        }
+
         createWindow();
         createTray();
         createMenu();
