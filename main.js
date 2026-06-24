@@ -46,8 +46,8 @@ function saveSettings() {
     }
 }
 
-// Limit V8 engine space size to 512MB to force aggressive garbage collection and prevent memory leaks
-app.commandLine.appendSwitch('js-flags', '--max-old-space-size=512');
+// Set V8 engine old space size to 4GB (4096MB) to ensure smooth performance without GC pauses
+app.commandLine.appendSwitch('js-flags', '--max-old-space-size=4096');
 
 // Request single instance lock
 const gotTheLock = app.requestSingleInstanceLock();
@@ -104,12 +104,26 @@ function createWindow() {
     });
 
     // Strip Gemini's internal web borders and scrollbars to prevent visual artifacts
-    mainWindow.webContents.on('did-finish-load', () => {
+    const injectCSS = () => {
         mainWindow.webContents.insertCSS(`
-            html, body {
+            html {
+                overflow: hidden !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+            }
+            body {
                 border: none !important;
                 margin: 0 !important;
                 padding: 0 !important;
+                transform: translateY(40px) !important;
+                height: calc(100vh - 40px) !important;
+                width: 100% !important;
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                overflow: auto !important;
             }
             #app-root, .app-container, main, mat-sidenav-container, .side-nav-container {
                 border: none !important;
@@ -124,30 +138,11 @@ function createWindow() {
             }
 
             /* Custom Titlebar and Drag Region */
-            html {
-                transform: translateY(40px) !important;
-                height: calc(100vh - 40px) !important;
-                width: 100vw !important;
-                position: absolute !important;
-                top: 0 !important;
-                left: 0 !important;
-                box-sizing: border-box !important;
-                overflow: hidden !important;
-            }
-
-            body {
-                height: 100% !important;
-                width: 100% !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                overflow: auto !important;
-            }
-
             #custom-titlebar {
                 position: fixed !important;
-                top: -40px !important;
+                top: 0px !important;
                 left: 0 !important;
-                width: 100vw !important;
+                width: 100% !important;
                 height: 40px !important;
                 z-index: 2147483647 !important;
                 background-color: #1E1F22 !important;
@@ -174,7 +169,7 @@ function createWindow() {
                 right: 138px !important;
                 top: 0 !important;
                 -webkit-app-region: no-drag !important;
-                background: transparent !important;
+                background-color: transparent !important;
                 border: none !important;
                 color: #C4C7C5 !important;
                 cursor: pointer !important;
@@ -186,11 +181,11 @@ function createWindow() {
                 justify-content: center !important;
             }
 
-            body.platform-darwin #custom-titlebar-title {
+            .platform-darwin #custom-titlebar-title {
                 left: 80px !important;
             }
 
-            body.platform-darwin .titlebar-reload-btn {
+            .platform-darwin .titlebar-reload-btn {
                 right: 16px !important;
                 width: 32px !important;
                 height: 32px !important;
@@ -199,12 +194,11 @@ function createWindow() {
             }
 
             .titlebar-reload-btn:hover {
-                background-color: rgba(255, 255, 255, 0.06) !important;
-                color: #E3E3E3 !important;
+                background-color: rgba(255, 255, 255, 0.1) !important;
             }
 
             .titlebar-reload-btn:active {
-                background-color: rgba(255, 255, 255, 0.12) !important;
+                background-color: rgba(255, 255, 255, 0.15) !important;
             }
 
             .titlebar-reload-btn svg {
@@ -215,17 +209,22 @@ function createWindow() {
 
             /* Hide titlebar and restore size in fullscreen */
             @media (display-mode: fullscreen) {
-                html {
+                body {
                     transform: none !important;
                     height: 100vh !important;
-                    width: 100vw !important;
+                    width: 100% !important;
                 }
                 #custom-titlebar {
                     display: none !important;
                 }
             }
         `);
-    });
+    };
+
+    mainWindow.webContents.on('did-navigate', injectCSS);
+    mainWindow.webContents.on('dom-ready', injectCSS);
+    mainWindow.webContents.on('did-frame-finish-load', injectCSS);
+    mainWindow.webContents.on('did-finish-load', injectCSS);
 
     // Minimize to tray on close
     mainWindow.on('close', (event) => {

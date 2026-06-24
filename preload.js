@@ -39,15 +39,98 @@ const injectTitlebar = () => {
     titlebar.appendChild(title);
     titlebar.appendChild(reloadBtn);
 
-    // Apply platform class to body if available
+    // Apply platform class to html if available
     if (document.body) {
         if (isMac) {
-            document.body.classList.add('platform-darwin');
+            document.documentElement.classList.add('platform-darwin');
         } else {
-            document.body.classList.add('platform-win32');
+            document.documentElement.classList.add('platform-win32');
         }
         
-        document.body.insertBefore(titlebar, document.body.firstChild);
+        // Style the custom titlebar and body inline immediately to prevent flash of unstyled content
+        // 1. Custom Titlebar Inline Styling
+        titlebar.style.setProperty('position', 'fixed', 'important');
+        titlebar.style.setProperty('top', '0px', 'important');
+        titlebar.style.setProperty('left', '0', 'important');
+        titlebar.style.setProperty('width', '100%', 'important');
+        titlebar.style.setProperty('height', '40px', 'important');
+        titlebar.style.setProperty('zIndex', '2147483647', 'important');
+        titlebar.style.setProperty('backgroundColor', '#1E1F22', 'important');
+        titlebar.style.setProperty('display', 'flex', 'important');
+        titlebar.style.setProperty('alignItems', 'center', 'important');
+        titlebar.style.setProperty('boxSizing', 'border-box', 'important');
+        titlebar.style.setProperty('-webkit-app-region', 'drag', 'important');
+        titlebar.style.setProperty('borderBottom', '1px solid rgba(255, 255, 255, 0.05)', 'important');
+        titlebar.style.setProperty('userSelect', 'none', 'important');
+
+        // 2. Custom Title Inline Styling
+        title.style.setProperty('position', 'absolute', 'important');
+        if (isMac) {
+            title.style.setProperty('left', '80px', 'important');
+        } else {
+            title.style.setProperty('left', '16px', 'important');
+        }
+        title.style.setProperty('color', '#C4C7C5', 'important');
+        title.style.setProperty('fontSize', '12px', 'important');
+        title.style.setProperty('fontFamily', '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', 'important');
+        title.style.setProperty('fontWeight', '500', 'important');
+        title.style.setProperty('pointerEvents', 'none', 'important');
+
+        // 3. Reload Button Inline Styling
+        reloadBtn.style.setProperty('position', 'absolute', 'important');
+        if (isMac) {
+            reloadBtn.style.setProperty('right', '16px', 'important');
+            reloadBtn.style.setProperty('width', '32px', 'important');
+            reloadBtn.style.setProperty('height', '32px', 'important');
+            reloadBtn.style.setProperty('borderRadius', '50%', 'important');
+            reloadBtn.style.setProperty('top', '4px', 'important');
+        } else {
+            reloadBtn.style.setProperty('right', '138px', 'important');
+            reloadBtn.style.setProperty('width', '46px', 'important');
+            reloadBtn.style.setProperty('height', '40px', 'important');
+            reloadBtn.style.setProperty('borderRadius', '0', 'important');
+            reloadBtn.style.setProperty('top', '0px', 'important');
+        }
+        reloadBtn.style.setProperty('-webkit-app-region', 'no-drag', 'important');
+        reloadBtn.style.setProperty('background-color', 'transparent', 'important');
+        reloadBtn.style.setProperty('border', 'none', 'important');
+        reloadBtn.style.setProperty('color', '#C4C7C5', 'important');
+        reloadBtn.style.setProperty('cursor', 'pointer', 'important');
+        reloadBtn.style.setProperty('display', 'flex', 'important');
+        reloadBtn.style.setProperty('alignItems', 'center', 'important');
+        reloadBtn.style.setProperty('justifyContent', 'center', 'important');
+
+        // Interactive hover states using event listeners
+        reloadBtn.addEventListener('mouseenter', () => {
+            reloadBtn.style.setProperty('background-color', 'rgba(255, 255, 255, 0.1)', 'important');
+        });
+        reloadBtn.addEventListener('mouseleave', () => {
+            reloadBtn.style.setProperty('background-color', 'transparent', 'important');
+        });
+        reloadBtn.addEventListener('mousedown', () => {
+            reloadBtn.style.setProperty('background-color', 'rgba(255, 255, 255, 0.15)', 'important');
+        });
+        reloadBtn.addEventListener('mouseup', () => {
+            reloadBtn.style.setProperty('background-color', 'rgba(255, 255, 255, 0.1)', 'important');
+        });
+
+        // 4. SVG Inline Styling
+        svg.style.setProperty('width', '18px', 'important');
+        svg.style.setProperty('height', '18px', 'important');
+        svg.style.setProperty('fill', 'currentColor', 'important');
+
+        // 5. Shift body down immediately (since titlebar is now inserted in documentElement)
+        document.body.style.setProperty('transform', 'translateY(40px)', 'important');
+        document.body.style.setProperty('height', 'calc(100vh - 40px)', 'important');
+        document.body.style.setProperty('position', 'absolute', 'important');
+        document.body.style.setProperty('width', '100%', 'important');
+        document.body.style.setProperty('margin', '0', 'important');
+        document.body.style.setProperty('padding', '0', 'important');
+        document.body.style.setProperty('top', '0', 'important');
+        document.body.style.setProperty('left', '0', 'important');
+
+        // Insert custom-titlebar directly to documentElement (html tag) so it is outside body
+        document.documentElement.insertBefore(titlebar, document.documentElement.firstChild);
     }
 };
 
@@ -68,3 +151,4 @@ const startupInterval = setInterval(() => {
         }, 1000);
     }
 }, 100);
+
