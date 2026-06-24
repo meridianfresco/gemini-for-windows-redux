@@ -86,6 +86,14 @@ function createWindow() {
         event.preventDefault();
     });
 
+    // Track maximized state to adjust custom titlebar alignment on Windows
+    mainWindow.on('maximize', () => {
+        mainWindow.webContents.executeJavaScript(`document.documentElement.classList.add('maximized')`).catch(() => {});
+    });
+    mainWindow.on('unmaximize', () => {
+        mainWindow.webContents.executeJavaScript(`document.documentElement.classList.remove('maximized')`).catch(() => {});
+    });
+
     mainWindow.webContents.userAgent = FIREFOX_UA;
     mainWindow.loadURL('https://gemini.google.com/');
 
@@ -157,6 +165,10 @@ function createWindow() {
             #custom-titlebar-title {
                 position: absolute !important;
                 left: 16px !important;
+                top: 0 !important;
+                bottom: 0 !important;
+                display: flex !important;
+                align-items: center !important;
                 color: #C4C7C5 !important;
                 font-size: 12px !important;
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
@@ -174,7 +186,7 @@ function createWindow() {
                 color: #C4C7C5 !important;
                 cursor: pointer !important;
                 width: 46px !important;
-                height: 40px !important;
+                height: 100% !important;
                 border-radius: 0 !important;
                 display: flex !important;
                 align-items: center !important;
@@ -207,6 +219,12 @@ function createWindow() {
                 fill: currentColor !important;
             }
 
+            /* Adjust titlebar height and top margin on Windows when maximized */
+            .platform-win32.maximized #custom-titlebar {
+                height: 32px !important;
+                top: 8px !important;
+            }
+
             /* Hide titlebar and restore size in fullscreen */
             @media (display-mode: fullscreen) {
                 body {
@@ -219,6 +237,14 @@ function createWindow() {
                 }
             }
         `);
+        // Sync maximized class state on Windows
+        if (process.platform === 'win32') {
+            if (mainWindow.isMaximized()) {
+                mainWindow.webContents.executeJavaScript(`document.documentElement.classList.add('maximized')`).catch(() => {});
+            } else {
+                mainWindow.webContents.executeJavaScript(`document.documentElement.classList.remove('maximized')`).catch(() => {});
+            }
+        }
     };
 
     mainWindow.webContents.on('did-navigate', injectCSS);

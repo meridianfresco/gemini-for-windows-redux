@@ -50,10 +50,10 @@ const injectTitlebar = () => {
         // Style the custom titlebar and body inline immediately to prevent flash of unstyled content
         // 1. Custom Titlebar Inline Styling
         titlebar.style.setProperty('position', 'fixed', 'important');
-        titlebar.style.setProperty('top', '0px', 'important');
+        titlebar.style.setProperty('top', '0px');
         titlebar.style.setProperty('left', '0', 'important');
         titlebar.style.setProperty('width', '100%', 'important');
-        titlebar.style.setProperty('height', '40px', 'important');
+        titlebar.style.setProperty('height', '40px');
         titlebar.style.setProperty('zIndex', '2147483647', 'important');
         titlebar.style.setProperty('backgroundColor', '#1E1F22', 'important');
         titlebar.style.setProperty('display', 'flex', 'important');
@@ -65,6 +65,10 @@ const injectTitlebar = () => {
 
         // 2. Custom Title Inline Styling
         title.style.setProperty('position', 'absolute', 'important');
+        title.style.setProperty('top', '0', 'important');
+        title.style.setProperty('bottom', '0', 'important');
+        title.style.setProperty('display', 'flex', 'important');
+        title.style.setProperty('alignItems', 'center', 'important');
         if (isMac) {
             title.style.setProperty('left', '80px', 'important');
         } else {
@@ -87,7 +91,7 @@ const injectTitlebar = () => {
         } else {
             reloadBtn.style.setProperty('right', '138px', 'important');
             reloadBtn.style.setProperty('width', '46px', 'important');
-            reloadBtn.style.setProperty('height', '40px', 'important');
+            reloadBtn.style.setProperty('height', '100%', 'important');
             reloadBtn.style.setProperty('borderRadius', '0', 'important');
             reloadBtn.style.setProperty('top', '0px', 'important');
         }
