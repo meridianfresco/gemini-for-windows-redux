@@ -284,7 +284,7 @@ const injectTitlebar = () => {
             });
             closeBtn.addEventListener('mouseleave', () => {
                 closeBtn.style.setProperty('background-color', 'transparent', 'important');
-                closeBtn.style.setProperty('color', '#C4C7C5', 'important');
+                closeBtn.style.setProperty('color', 'var(--titlebar-color, #C4C7C5)', 'important');
             });
             closeBtn.addEventListener('mousedown', () => {
                 closeBtn.style.setProperty('background-color', '#F1707A', 'important');
