@@ -221,8 +221,13 @@ function createWindow() {
 
             /* Adjust titlebar height and top margin on Windows when maximized */
             .platform-win32.maximized #custom-titlebar {
-                height: 32px !important;
+                height: 34px !important;
                 top: 8px !important;
+            }
+
+            .platform-win32.maximized body {
+                transform: translateY(42px) !important;
+                height: calc(100vh - 42px) !important;
             }
 
             /* Hide titlebar and restore size in fullscreen */
