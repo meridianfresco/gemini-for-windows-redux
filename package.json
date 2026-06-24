@@ -38,7 +38,10 @@
       "output": "dist-electron"
     },
     "win": {
-      "target": "nsis",
+      "target": [
+        "nsis",
+        "portable"
+      ],
       "icon": "icon.ico"
     }
   },
